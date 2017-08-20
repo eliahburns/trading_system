@@ -42,6 +42,12 @@ public:
   void turn_on() { on_ = true; }
   void turn_off() { on_ = false; ready_ = false; }
 
+  const bool messages_left()
+  {
+    return (static_cast<std::size_t>(time_series_idx_ + 1) < messages_.size());
+  }
+
+
 private:
   std::pair<aligned::message_t, aligned::message_t> make_message(csv_row row);
 
@@ -83,6 +89,7 @@ public:
   void respond();
 
   void turn_off() { on_ = false; }
+
 
   void release_response();
 

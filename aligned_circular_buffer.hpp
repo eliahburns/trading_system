@@ -10,7 +10,8 @@
 #include <utility>
 #include <cstdint>
 #include <cassert>
-#include "../trading_system_components/ipc_messages.hpp"
+#include <atomic>
+#include "ipc_messages.hpp"
 
 
 template<class T, std::size_t N>
@@ -23,6 +24,7 @@ public:
     typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
   aligned_circular_buffer()
+    : m_size_{0}, read_{0}, write_{0}, capacity_{N}
     {
       assert((!(N & (N-1))) && N);
 
@@ -50,12 +52,12 @@ public:
   const bool empty() const { return read_ == write_; }
   const bool full() const { return size() == capacity_; }
 
-  const T& pop_front()
+  T pop_front()
   {
     return operator[](mask(++read_));
   }
 
-  void push_back(const T& elem)
+  void push_back(T elem)
   {
     if (full())
       ++read_;
@@ -64,7 +66,8 @@ public:
   }
 
 private:
-  template<typename ...Args> void emplace_back(Args&&... args)
+  template<typename ...Args>
+  void emplace_back(Args&&... args)
   {
     if( m_size_ >= N )
       throw std::bad_alloc{};
@@ -78,13 +81,14 @@ private:
     return *reinterpret_cast<T*>(data_+pos);
   }
 
-  const aligned_size_type mask(aligned_size_type val) const  { return val & (capacity_ - 1); }
+  const aligned_size_type mask(aligned_size_type val) const
+  { return val & (capacity_ - 1); }
 
   aligned_storage_type data_[N]; // aligned uninitialized storage for N T's
-  std::size_t m_size_ = 0;
-  aligned_size_type read_ = 0;
-  aligned_size_type write_ = 0;
-  aligned_size_type capacity_ = N;
+  std::atomic<std::size_t> m_size_;
+  std::atomic<aligned_size_type> read_;
+  std::atomic<aligned_size_type> write_;
+  std::atomic<aligned_size_type> capacity_;
 };
 
 

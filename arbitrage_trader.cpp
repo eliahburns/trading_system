@@ -253,12 +253,6 @@ void arbitrage_trader::check_stop_loss(symbol_name symbol)
       to_gateway_out.side = side_type::bid_side;
       to_gateway_out.price = best_tob.ask_price; // not really used
       to_gateway_out.venue = best_tob.venue;
-      /*
-      bid b = generate_bid(aligned::order_type::market, symbol, best_tob.venue,
-                           best_tob.ask_price, to_gateway_out.quantity,
-                           ++strat_order_id_, implementation::get_time());
-      add_quote(b);
-       */
     }
     else
     {
@@ -267,12 +261,6 @@ void arbitrage_trader::check_stop_loss(symbol_name symbol)
       to_gateway_out.side = side_type::ask_side;
       to_gateway_out.price = best_tob.ask_price; // not really used
       to_gateway_out.venue = best_tob.venue;
-      /*
-      ask a = generate_ask(aligned::order_type::ioc, symbol, best_tob.venue,
-                           best_tob.bid_price, to_gateway_out.quantity,
-                           ++strat_order_id_, implementation::get_time());
-      add_quote(a);
-      */
     }
     to_gateway_out.internal_order_id = generate_new_order_id();
     to_gateway_out.event_time = implementation::get_time();
@@ -300,5 +288,6 @@ aligned::tob_t arbitrage_trader::best_market_to_exit_in(symbol_name symbol,
   }
   return best_tob;
 }
+
 
 

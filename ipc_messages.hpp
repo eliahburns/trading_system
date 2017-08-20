@@ -24,6 +24,7 @@ constexpr auto to_underlying_type(E e) -> typename std::underlying_type<E>::type
 namespace aligned
 {
 
+
   template <typename E>
   std::string enum_str(E e)
   {
@@ -107,6 +108,10 @@ namespace aligned
     msg_size_t order_id = 0;
     msg_size_t entry_time = 0;
   };
+
+  std::string symbol_to_str(symbol_name symbol_n);
+
+  std::string venue_to_str(venue_name venue_n);
 
 }
 

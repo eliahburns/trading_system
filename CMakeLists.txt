@@ -8,6 +8,8 @@ include_directories("/usr/local/lib")
 include_directories("/usr/local/include/mongocxx/v_noabi/")
 include_directories("/usr/local/include/bsoncxx/v_noabi/")
 
+include_directories("../Catch/single_include/")
+
 set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_EXE_LINKER_FLAGS
@@ -18,7 +20,7 @@ set(SOURCE_FILES main.cpp buffer_types.hpp aligned_circular_buffer.hpp quote.hpp
         book_builder.hpp strategy.hpp arbitrage_trader.hpp book_builder.cpp
         arbitrage_trader.cpp trading_system_viewer.cpp trading_system_viewer.hpp
         order_manager.cpp fake_gateway.hpp fake_gateway.cpp
-        strategy.cpp)
+        strategy.cpp ipc_messages.cpp test_bb_with_data.cpp)
 
 add_executable(trading_system ${SOURCE_FILES})
 

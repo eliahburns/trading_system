@@ -76,27 +76,31 @@ void trading_system_viewer::adjust_stop_loss()
   double new_stop = 4;
   std::cin >> new_stop;
   arbitrage_trader_.set_stop_loss(new_stop);
-  std::cout << "new stop loss value set to " << new_stop << std::endl;
+  std::cout << "...new stop loss value set to " << new_stop << std::endl;
 }
 
 void trading_system_viewer::start_trading()
 {
   arbitrage_trader_.start_new_positions();
+  std::cout << "...ready to trade" << std::endl;
 }
 
 void trading_system_viewer::stop_trading()
 {
   arbitrage_trader_.cease_new_positions();
+  std::cout << "...stopping all trading" << std::endl;
 }
 
 void trading_system_viewer::cancel_all_orders()
 {
   // TODO : implement with strategy or arbitrage_trader
+  std::cout << "...canceling all orders" << std::endl;
 }
 
 void trading_system_viewer::turn_off_order_manager()
 {
- order_manager_.shut_down();
+  std::cout << "...turning off order manager" << std::endl;
+  order_manager_.shut_down();
 }
 
 void trading_system_viewer::wait_till_ready()
@@ -144,7 +148,7 @@ void trading_system_viewer::drop_all_logs()
 
 void trading_system_viewer::turn_on_gateways()
 {
-  std::cout << "turning on gateways" << std::endl;
+  std::cout << "...turning on gateways" << std::endl;
   for (fake_gateway_in& gw : gateways_in_vec_)
     gw.turn_on();
   // fake gateway out is on by default

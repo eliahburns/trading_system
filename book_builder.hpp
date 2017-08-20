@@ -28,7 +28,8 @@ public:
   book_builder(
     tsc_type book_builder_id,
     aligned::gw_to_bk_buffer& gw_to_bk_buffer1,
-    aligned::bk_to_strat_buffer& bk_to_strat_buffer1
+    aligned::bk_to_strat_buffer& bk_to_strat_buffer1,
+    aligned::symbol_name symbol, aligned::venue_name venue
   );
 
   void component_main_loop() override;
@@ -56,7 +57,7 @@ public:
   void turn_off() { component_ready_ = false; }
 
 private:
-  const bool tob_is_same(aligned::tob_t& new_tob) const;
+  const bool tob_is_same(const aligned::tob_t& new_tob);
 
   aligned::gw_to_bk_buffer& gw_to_bk_buffer_;
   aligned::bk_to_strat_buffer& bk_to_strat_buffer_;
@@ -66,6 +67,11 @@ private:
   aligned::tob_t last_tob_change_;
   std::string collection_name_;
   aligned::tob_buffer_t tob_buffer_;
+
+  aligned::symbol_name symbol_;
+  aligned::venue_name venue_;
+  unsigned tob_change_count_{0};
+  unsigned px_change_count_{0};
 };
 
 

@@ -6,10 +6,13 @@
 
 book_builder::book_builder(trading_system_component::tsc_type book_builder_id,
                            aligned::gw_to_bk_buffer &gw_to_bk_buffer1,
-                           aligned::bk_to_strat_buffer &bk_to_strat_buffer1)
+                           aligned::bk_to_strat_buffer &bk_to_strat_buffer1,
+                           aligned::symbol_name symbol, aligned::venue_name venue
+  )
   : trading_system_component(book_builder_id),
     gw_to_bk_buffer_(gw_to_bk_buffer1),
-    bk_to_strat_buffer_(bk_to_strat_buffer1)
+    bk_to_strat_buffer_(bk_to_strat_buffer1),
+    symbol_(symbol), venue_(venue)
 {
   collection_name_ += "book_builder_" + std::to_string(book_builder_id);
   component_ready_ = true;
@@ -32,7 +35,14 @@ void book_builder::update_book(aligned::message_t msg)
   else if (msg.type == aligned::order_type::modify)
   {
     // look up price corresponding to order id, to find order quicker in book
-    auto px = id_price_map_.find(msg.order_id)->second;
+    auto px_it = id_price_map_.find(msg.order_id);
+    if (px_it == id_price_map_.end())
+    {
+      id_price_map_.emplace(msg.order_id, msg.price);
+      return;
+    }
+    auto px = px_it->second;
+
     if (msg.side == aligned::side_type::ask_side)
       asks_.modify_quote(msg, px);
     else
@@ -52,9 +62,13 @@ void book_builder::update_book(aligned::message_t msg)
     id_price_map_.erase(msg.order_id);
   }
   else
-  {
+  {/*
     std::cout << "Warning: unexpected message type in update_book" << std::endl;
     std::cout << static_cast<unsigned>(msg.type) << std::endl;
+    std::cout << symbol_to_str(msg.symbol) << std::endl;
+    std::cout << venue_to_str(msg.venue) << std::endl;
+    std::cout << std::to_string(msg.order_id) << std::endl;
+    */
   }
 }
 
@@ -64,17 +78,19 @@ void book_builder::handle_update()
 {
   if (!gw_to_bk_buffer_.empty())
   {
-    auto msg = gw_to_bk_buffer_.pop_front();
+    aligned::message_t msg{};
+    msg = gw_to_bk_buffer_.pop_front();
     update_book(msg);
 
     // calculate top of book after updating book
-    auto tob = top_of_book();
+    aligned::tob_t tob = top_of_book();
     if (!tob_is_same(tob))
     {
       bk_to_strat_buffer_.push_back(tob);
       tob_buffer_.push_back(tob);
       last_tob_change_ = tob;
       log_update();
+      ++tob_change_count_;
     }
   }
 }
@@ -112,12 +128,14 @@ aligned::tob_t book_builder::top_of_book()
   tob.bid_quantity =
     bids_.volume_between_inclusive<bid>(tob.bid_price, tob.bid_price);
 
+  tob.symbol = symbol_;
+  tob.venue = venue_;
   tob.book_timestamp = get_time();
 
   return tob;
 }
 
-const bool book_builder::tob_is_same(aligned::tob_t &new_tob) const
+const bool book_builder::tob_is_same(const aligned::tob_t &new_tob)
 {
   if (new_tob.bid_price == 0 || new_tob.ask_price == 0)
     return true;
@@ -132,7 +150,6 @@ const bool book_builder::tob_is_same(aligned::tob_t &new_tob) const
 
 void book_builder::log_update()
 // we want to log updates for each message received / tob message sent.
-// TODO: decide on how many collections to use for logging
 {
   using namespace aligned;
   if (!tob_buffer_.empty())

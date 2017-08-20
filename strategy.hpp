@@ -189,6 +189,8 @@ public:
 
   const bool has_position();
 
+  void log_pnl();
+
 protected:
   aligned::om_to_strat_buffer& om_to_strat_buffer_;
   aligned::strat_to_om_buffer& strat_to_om_buffer_;
@@ -814,6 +816,8 @@ void strategy<T>::add_quote(const bid &b)
 {
   bids_.emplace(b.symbol, b);
   add_quote_database(b);
+  log_pnl();
+
 }
 
 template <typename T>
@@ -821,6 +825,7 @@ void strategy<T>::add_quote(const ask& a)
 {
   asks_.emplace(a.symbol, a);
   add_quote_database(a);
+  log_pnl();
 }
 
 template <typename T>
@@ -830,6 +835,31 @@ const bool strategy<T>::has_position()
     if (current_position(it->first))
       return true;
   return false;
+}
+
+template <typename T>
+void strategy<T>::log_pnl()
+{
+    using namespace aligned;
+    std::string pnl{"PnL"};
+    auto collection = implementation::conn_[collection_name_][pnl];
+
+    const double p = 0;
+    auto symbol = symbol_name::none;
+    for (auto elem : symbol_markets_)
+        if (elem.first != symbol)
+        {
+          symbol = elem.first;
+          const double p = current_pnl(symbol);
+          auto builder = bsoncxx::builder::stream::document{};
+          bsoncxx::document::value doc_value = builder
+            << "symbol" << symbol_to_str(symbol)
+            << "event_time" << std::to_string(implementation::get_time())
+            << "pnl" << std::to_string(p)
+            << bsoncxx::builder::stream::finalize;
+          collection.insert_one(doc_value.view());
+        }
+
 }
 
 #endif //TRADING_SYSTEM_COMPONENTS_STRATEGY_HPP

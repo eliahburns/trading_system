@@ -5,6 +5,7 @@
 #include "fake_gateway.hpp"
 
 #include <tuple>
+#include <thread>
 
 std::istream& operator>>(std::istream& str, csv_row& data)
 {
@@ -18,13 +19,15 @@ fake_gateway_in::fake_gateway_in(aligned::symbol_name symbol,
                                  std::string data_file_name,
                                  unsigned long throttle_milli,
                                  aligned::gw_to_bk_buffer& to_bk_buffer)
-  : symbol_(symbol), venue_(venue), data_file_name_(std::move(data_file_name)),
+  : symbol_(symbol), venue_(venue), data_file_name_(data_file_name),
     throttle_(throttle_milli), to_bk_buffer_(to_bk_buffer)
 {
   // set up message vector
   using namespace aligned;
 
   std::ifstream file(data_file_name_);
+  if (!file.is_open())
+    throw std::runtime_error{"file is not open"};
   csv_row row;
   file >> row;
   // add first two messages for market
@@ -37,11 +40,16 @@ fake_gateway_in::fake_gateway_in(aligned::symbol_name symbol,
   a_msg.type = order_type::add;
   b_msg.order_id = new_id();
   a_msg.order_id = new_id();
+  a_msg.symbol = symbol_;
+  b_msg.symbol = symbol_;
+  a_msg.venue = venue_;
+  b_msg.venue = venue_;
   // time gets add when message is put into book buffer
   messages_.push_back(b_msg);
   messages_.push_back(a_msg);
   prev_a_msg = a_msg;
   prev_b_msg = b_msg;
+
   while(file >> row)
   {
     std::tie(b_msg, a_msg) = make_message(row);
@@ -50,9 +58,11 @@ fake_gateway_in::fake_gateway_in(aligned::symbol_name symbol,
     prev_a_msg = a_msg;
     prev_b_msg = b_msg;
   }
+  file.close();
 }
 
-std::pair<aligned::message_t, aligned::message_t> fake_gateway_in::make_message(csv_row row)
+std::pair<aligned::message_t, aligned::message_t>
+fake_gateway_in::make_message(csv_row row)
 {
   aligned::message_t msg{};
   msg.symbol = symbol_;
@@ -78,26 +88,31 @@ void fake_gateway_in::add_modify_delete_message(aligned::message_t& msg,
   {
     // delete previous message and add new with new order id
     prev_msg.type = aligned::order_type::delete_;
-    messages_.emplace_back(prev_msg);
+    aligned::message_t new_msg{};
+    new_msg = prev_msg;
+    messages_.emplace_back(new_msg);
     msg.order_id = new_id();
     msg.type = aligned::order_type::add;
-    messages_.emplace_back(msg);
-    return;
+    aligned::message_t new_msg1{};
+    new_msg1 = msg;
+    messages_.emplace_back(new_msg1);
   }
-  if (msg.quantity != prev_msg.quantity)
+  else if (msg.quantity != prev_msg.quantity &&  msg.price == prev_msg.price)
   {
     // send modify message with same order id
     msg.order_id = prev_msg.order_id;
     msg.type = aligned::order_type::modify;
-    messages_.emplace_back(msg);
+    aligned::message_t new_msg1{};
+    new_msg1 = msg;
+    messages_.emplace_back(new_msg1);
   }
 }
 
 void fake_gateway_in::release_next_update()
 {
-  if (get_time() - last_release_time_ >= throttle_)
+  if ((get_time() - last_release_time_ >= throttle_) )
   {
-    auto update = next_update();
+    aligned::message_t update = next_update();
     update.price += price_offset_;
     update.entry_time = get_time();
 
@@ -111,7 +126,18 @@ void fake_gateway_in::in_main_loop()
   while (ready_)
     while(on_)
     {
-      release_next_update();
+      for (auto update : messages_)
+      {
+        update.price += price_offset_;
+        update.entry_time = get_time();
+        if (update.type != aligned::order_type::add &&
+          update.type != aligned::order_type::modify &&
+          update.type != aligned::order_type::delete_ )
+          std::cout << "ORDER TYPE IS NONE (fake in)" << std::endl;
+        to_bk_buffer_.push_back(update);
+        std::this_thread::sleep_for(std::chrono::milliseconds(throttle_));
+      }
+      //turn_off();
     }
 }
 
