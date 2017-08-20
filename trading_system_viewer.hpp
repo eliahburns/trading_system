@@ -8,6 +8,7 @@
 #include "order_manager.hpp"
 #include "arbitrage_trader.hpp"
 #include "book_builder.hpp"
+#include "fake_gateway.hpp"
 
 
 class trading_system_viewer
@@ -15,10 +16,12 @@ class trading_system_viewer
 public:
   using books_vec_t =
   std::vector<std::reference_wrapper<book_builder>>;
+  using gateways_in_vec_t =
+  std::vector<std::reference_wrapper<fake_gateway_in>>;
 
   // takes as arguments references to all components in trading system
   trading_system_viewer(order_manager& order_manager1,
-    arbitrage_trader& arbitrage_trader1);
+    arbitrage_trader& arbitrage_trader1, fake_gateway_out& fake_gateway_out1);
 
   trading_system_viewer(const trading_system_viewer&) = delete;
   trading_system_viewer&operator=(const trading_system_viewer&) = delete;
@@ -31,6 +34,8 @@ public:
 
   void register_book_builder(
     std::reference_wrapper<book_builder> book_builder_ref);
+
+  void turn_off_order_manager();
 
   void turn_off_trading();
 
@@ -52,10 +57,22 @@ public:
 
   const bool all_books_ready();
 
+  void turn_on_gateways();
+
+  void turn_off_gateways();
+
+  void turn_off_books();
+
+  void register_gateway_in(std::reference_wrapper<fake_gateway_in> f_in)
+  { gateways_in_vec_.push_back(f_in); }
+
 private:
   order_manager& order_manager_;
   arbitrage_trader& arbitrage_trader_;
   books_vec_t books_vec_;
+  gateways_in_vec_t gateways_in_vec_;
+  fake_gateway_out& fake_gateway_out_;
+  bool on_{true};
 };
 
 

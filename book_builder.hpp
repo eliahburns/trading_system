@@ -53,6 +53,8 @@ public:
 
   void drop_tob_updates();
 
+  void turn_off() { component_ready_ = false; }
+
 private:
   const bool tob_is_same(aligned::tob_t& new_tob) const;
 

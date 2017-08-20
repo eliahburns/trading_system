@@ -5,9 +5,10 @@
 #include "trading_system_viewer.hpp"
 
 trading_system_viewer::trading_system_viewer(
-  order_manager &order_manager1, arbitrage_trader &arbitrage_trader1
-)
-  : order_manager_(order_manager1), arbitrage_trader_(arbitrage_trader1)
+  order_manager &order_manager1, arbitrage_trader &arbitrage_trader1,
+  fake_gateway_out& fake_gateway_out1)
+  : order_manager_(order_manager1), arbitrage_trader_(arbitrage_trader1),
+    fake_gateway_out_(fake_gateway_out1)
 {
   arbitrage_trader_.cease_new_positions();  // prevent trading before user ready
 }
@@ -17,9 +18,8 @@ void trading_system_viewer::viewer_main_loop()
   wait_till_ready();
   // get user input
   std::string input_;
-  while(input_ != "quit")
+  while(on_)
   {
-    std::cin >> input_;
     // break if user wants to quit
     if (input_ == "start_trading")
       start_trading();
@@ -31,8 +31,18 @@ void trading_system_viewer::viewer_main_loop()
       current_pnl();
     else if (input_ == "cancel_all_orders")
       cancel_all_orders();
+    else if (input_ == "turn_on_gateways")
+      turn_on_gateways();
+    std::cin >> input_;
+    if (input_ == "quit")
+      on_ = false;
   }
+  stop_trading();
+  while (arbitrage_trader_.has_position()) ;
   turn_off_trading();
+  turn_off_order_manager();
+  turn_off_books();
+  turn_off_gateways();
 }
 
 aligned::symbol_name
@@ -84,7 +94,7 @@ void trading_system_viewer::cancel_all_orders()
   // TODO : implement with strategy or arbitrage_trader
 }
 
-void trading_system_viewer::turn_off_trading()
+void trading_system_viewer::turn_off_order_manager()
 {
  order_manager_.shut_down();
 }
@@ -94,16 +104,19 @@ void trading_system_viewer::wait_till_ready()
   std::string input_;
 
   while (!(arbitrage_trader_.is_ready() && order_manager_.is_ready() &&
-           all_books_ready()) || input_ != "abort")
+           all_books_ready()) && input_ != "abort")
   {
-    std::cin >> input_;
     std::cout << "waiting for all trading system components ready."
               << std::endl;
-    std::cout << "enter 'abort' to cancel." << std::endl;
+    std::cout << "enter 'abort' to cancel start up." << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::cin >> input_;
   }
   // start with clean logs for testing and demo
   drop_all_logs();
+
+  if (input_ == "abort")
+    on_ = false;
 }
 
 void trading_system_viewer::register_book_builder(
@@ -127,5 +140,31 @@ void trading_system_viewer::drop_all_logs()
 
   arbitrage_trader_.drop_all_orders();
   order_manager_.drop_all_log_messages();
+}
+
+void trading_system_viewer::turn_on_gateways()
+{
+  std::cout << "turning on gateways" << std::endl;
+  for (fake_gateway_in& gw : gateways_in_vec_)
+    gw.turn_on();
+  // fake gateway out is on by default
+}
+
+void trading_system_viewer::turn_off_gateways()
+{
+  for (fake_gateway_in& gw : gateways_in_vec_)
+    gw.turn_off();
+  fake_gateway_out_.turn_off();
+}
+
+void trading_system_viewer::turn_off_trading()
+{
+  arbitrage_trader_.turn_off();
+}
+
+void trading_system_viewer::turn_off_books()
+{
+  for (book_builder& bb : books_vec_)
+    bb.turn_off();
 }
 

@@ -54,6 +54,7 @@ void book_builder::update_book(aligned::message_t msg)
   else
   {
     std::cout << "Warning: unexpected message type in update_book" << std::endl;
+    std::cout << static_cast<unsigned>(msg.type) << std::endl;
   }
 }
 

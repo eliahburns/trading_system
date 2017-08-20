@@ -106,6 +106,15 @@ void fake_gateway_in::release_next_update()
   }
 }
 
+void fake_gateway_in::in_main_loop()
+{
+  while (ready_)
+    while(on_)
+    {
+      release_next_update();
+    }
+}
+
 
 fake_gateway_out::fake_gateway_out(unsigned long throttle,
                                    aligned::gw_to_om_buffer &to_om_buffer,
@@ -160,5 +169,13 @@ void fake_gateway_out::release_response()
   {
     respond();
     last_release_time_ = get_time();
+  }
+}
+
+void fake_gateway_out::out_main_loop()
+{
+  while (on_)
+  {
+    release_response();
   }
 }

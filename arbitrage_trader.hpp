@@ -75,6 +75,8 @@ public:
 
   void start_new_positions() { open_new_trades_ = true; }
 
+  void turn_off() {implementation::component_ready_ = false; }
+
 private:
   signal_buffer signal_buffer_;
   execution_buffer execution_buffer_;

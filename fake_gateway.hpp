@@ -33,9 +33,14 @@ public:
 
   void release_next_update();
 
+  void in_main_loop();
+
   aligned::message_t next_update() { return messages_[++time_series_idx_]; }
 
   const std::size_t message_count() const { return messages_.size(); }
+
+  void turn_on() { on_ = true; }
+  void turn_off() { on_ = false; ready_ = false; }
 
 private:
   std::pair<aligned::message_t, aligned::message_t> make_message(csv_row row);
@@ -61,6 +66,8 @@ private:
   aligned::gw_to_bk_buffer& to_bk_buffer_;
   aligned::aligned_t order_id_{0};
   aligned::aligned_t last_release_time_{0};
+  bool on_{false};
+  bool ready_{true};
 };
 
 
@@ -71,10 +78,14 @@ public:
     unsigned long throttle, aligned::gw_to_om_buffer& to_om_buffer,
     aligned::om_to_gw_buffer& to_gw_buffer
   );
+  void out_main_loop();
 
   void respond();
 
+  void turn_off() { on_ = false; }
+
   void release_response();
+
 private:
   aligned::aligned_t get_time()
   {
@@ -86,6 +97,7 @@ private:
   aligned::gw_to_om_buffer& to_om_buffer_;
   aligned::om_to_gw_buffer& to_gw_buffer_;
   aligned::aligned_t last_release_time_{0};
+  bool on_{true};
 };
 
 

@@ -187,6 +187,7 @@ public:
 
   void drop_all_orders();
 
+  const bool has_position();
 
 protected:
   aligned::om_to_strat_buffer& om_to_strat_buffer_;
@@ -820,6 +821,15 @@ void strategy<T>::add_quote(const ask& a)
 {
   asks_.emplace(a.symbol, a);
   add_quote_database(a);
+}
+
+template <typename T>
+const bool strategy<T>::has_position()
+{
+  for (auto it = symbol_markets_.begin(); it != symbol_markets_.end(); ++it)
+    if (current_position(it->first))
+      return true;
+  return false;
 }
 
 #endif //TRADING_SYSTEM_COMPONENTS_STRATEGY_HPP
