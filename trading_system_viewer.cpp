@@ -38,7 +38,7 @@ void trading_system_viewer::viewer_main_loop()
       on_ = false;
   }
   stop_trading();
-  while (arbitrage_trader_.has_position()) ;
+  //while (arbitrage_trader_.has_position()) ;
   turn_off_trading();
   turn_off_order_manager();
   turn_off_books();
@@ -144,6 +144,7 @@ void trading_system_viewer::drop_all_logs()
 
   arbitrage_trader_.drop_all_orders();
   order_manager_.drop_all_log_messages();
+  arbitrage_trader_.drop_pnl_logs();
 }
 
 void trading_system_viewer::turn_on_gateways()

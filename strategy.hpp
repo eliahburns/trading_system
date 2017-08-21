@@ -190,6 +190,7 @@ public:
   const bool has_position();
 
   void log_pnl();
+  void drop_pnl_logs();
 
 protected:
   aligned::om_to_strat_buffer& om_to_strat_buffer_;
@@ -859,6 +860,15 @@ void strategy<T>::log_pnl()
             << bsoncxx::builder::stream::finalize;
           collection.insert_one(doc_value.view());
         }
+
+}
+
+template <typename T>
+void strategy<T>::drop_pnl_logs()
+{
+  std::string pnl{"PnL"};
+  auto collection = implementation::conn_[collection_name_][pnl];
+  collection.drop();
 
 }
 

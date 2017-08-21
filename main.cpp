@@ -119,8 +119,6 @@ int main()
   viewer.start_trading();
   viewer.turn_on_gateways();
 
-
-
   fake_in1_thread.join();
   fake_in2_thread.join();
   arb_thread.join();
