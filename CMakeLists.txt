@@ -20,7 +20,7 @@ set(SOURCE_FILES main.cpp buffer_types.hpp aligned_circular_buffer.hpp quote.hpp
         book_builder.hpp strategy.hpp arbitrage_trader.hpp book_builder.cpp
         arbitrage_trader.cpp trading_system_viewer.cpp trading_system_viewer.hpp
         order_manager.cpp fake_gateway.hpp fake_gateway.cpp
-        strategy.cpp ipc_messages.cpp test_bb_with_data.cpp)
+        strategy.cpp ipc_messages.cpp test/test_bb_with_data.cpp)
 
 add_executable(trading_system ${SOURCE_FILES})
 
