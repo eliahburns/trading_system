@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(trading_system)
 
-find_package(libmongocxx REQUIRED)
-find_package(libbsoncxx REQUIRED)
+#find_package(libmongocxx REQUIRED)
+#find_package(libbsoncxx REQUIRED)
 
 include_directories("/usr/local/lib")
 include_directories("/usr/local/include/mongocxx/v_noabi/")
