@@ -8,6 +8,7 @@
 #include "fake_gateway.hpp"
 #include "trading_system_viewer.hpp"
 
+
 class barrier
 {
 public:
@@ -31,12 +32,10 @@ private:
 };
 
 
-
-
-
 using namespace aligned;
 
-barrier barrier1(4);
+static barrier barrier1(8);
+static barrier barrier2(8);
 
 int main()
 {
@@ -96,28 +95,24 @@ int main()
   unsigned px_offset = 0;
   fake_in1.set_price_offset(px_offset);
 
-  std::thread v_thread;
-  std::thread om_thread;
-  std::thread f_out_thread;
-  std::thread book_thread1;
-  std::thread book_thread2;
-  std::thread arb_thread;
-  std::thread fake_in1_thread;
-  std::thread fake_in2_thread;
-
-  v_thread = std::thread(&trading_system_viewer::viewer_main_loop, &viewer);
-  om_thread = std::thread(&order_manager::component_main_loop, &order_man);
-  f_out_thread = std::thread(&fake_gateway_out::out_main_loop, &fake_out);
-  book_thread1 = std::thread(&book_builder::component_main_loop,&book_sym1_ven1);
-  book_thread2 = std::thread(&book_builder::component_main_loop,&book_sym1_ven2);
-  arb_thread = std::thread(&arbitrage_trader::component_main_loop, &arb_trader);
-  fake_in1_thread = std::thread(&fake_gateway_in::in_main_loop, &fake_in1);
-  fake_in2_thread = std::thread(&fake_gateway_in::in_main_loop, &fake_in2);
+  std::thread v_thread = std::thread(&trading_system_viewer::viewer_main_loop, std::ref(viewer));
+  std::thread om_thread = std::thread(&order_manager::component_main_loop, std::ref(order_man));
+  std::thread f_out_thread = std::thread(&fake_gateway_out::out_main_loop, std::ref(fake_out));
+  std::thread book_thread1 = std::thread(&book_builder::component_main_loop, std::ref(book_sym1_ven1));
+  std::thread book_thread2 = std::thread(&book_builder::component_main_loop, std::ref(book_sym1_ven2));
+  std::thread arb_thread = std::thread(&arbitrage_trader::component_main_loop, std::ref(arb_trader));
+  std::thread fake_in1_thread = std::thread(&fake_gateway_in::in_main_loop, std::ref(fake_in1));
+  std::thread fake_in2_thread = std::thread(&fake_gateway_in::in_main_loop, std::ref(fake_in2));
 
   //barrier1.wait();
+  std::cout << "all threads initialized" << std::endl;
+
 
   viewer.start_trading();
   viewer.turn_on_gateways();
+
+  //barrier2.wait();
+  std::cout << "main thread past turning on gateways" << std::endl;
 
   fake_in1_thread.join();
   fake_in2_thread.join();
