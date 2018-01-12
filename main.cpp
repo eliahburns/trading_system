@@ -8,38 +8,14 @@
 #include "fake_gateway.hpp"
 #include "trading_system_viewer.hpp"
 
-
-class barrier
-{
-public:
-  explicit barrier(std::size_t count)
-    : count_{count}
-  { }
-
-  void wait()
-  {
-    std::unique_lock<std::mutex> lock{mutex_};
-    if (--count_ == 0) {
-      cv_.notify_all();
-    } else {
-      cv_.wait(lock, [this] { return count_ == 0; });
-    }
-  }
-private:
-  std::mutex mutex_;
-  std::condition_variable cv_;
-  std::size_t count_;
-};
-
-
 using namespace aligned;
-
-static barrier barrier1(8);
-static barrier barrier2(8);
 
 int main()
 {
-  // example using a symbol listed at two different exchanges with fake gateways
+  /**
+   * example using a symbol listed at two different exchanges with fake gateways
+   */
+
   static gw_to_om_buffer gw_to_om_b;
   static gw_to_bk_buffer gw_to_bk_b_sym1_ven1;
   static gw_to_bk_buffer gw_to_bk_b_sym1_ven2;
@@ -62,7 +38,9 @@ int main()
   aligned_t trader_id = 7;
   aligned_t om_id = 9;
 
-  // components and gateways
+  /**
+   * components and gateways
+   */
   fake_gateway_in
     fake_in1(symbol1, venue1, data_file_name, throttle_in1,
              gw_to_bk_b_sym1_ven1);
@@ -104,15 +82,8 @@ int main()
   std::thread fake_in1_thread = std::thread(&fake_gateway_in::in_main_loop, std::ref(fake_in1));
   std::thread fake_in2_thread = std::thread(&fake_gateway_in::in_main_loop, std::ref(fake_in2));
 
-  //barrier1.wait();
-  std::cout << "all threads initialized" << std::endl;
-
-
   viewer.start_trading();
   viewer.turn_on_gateways();
-
-  //barrier2.wait();
-  std::cout << "main thread past turning on gateways" << std::endl;
 
   fake_in1_thread.join();
   fake_in2_thread.join();
