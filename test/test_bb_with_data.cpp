@@ -1,10 +1,11 @@
 //
 // Created by eli on 8/20/17.
 //
-/*
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ClangTidyInspection"
 #define CATCH_CONFIG_MAIN
+
 #include "catch.hpp"
 #include "ipc_messages.hpp"
 #include "buffer_types.hpp"
@@ -118,4 +119,3 @@ TEST_CASE("test book_builder with simulation data handle_update and fake "
 
 #pragma clang diagnostic pop
 
-*/
