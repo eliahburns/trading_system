@@ -6,7 +6,7 @@ In this directory is a program that shows an example use case using data
 from the *simulated\_data.csv* file.
 
 
-<img align="center" width="500" height="300"
+<img align="center" width="400" height="250"
      src="../data/db_viewer_screen_shot.png">
 
 
