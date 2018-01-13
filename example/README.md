@@ -37,7 +37,8 @@ we chose for the respective trading system components in **main.cpp.***
 
 It's likely you'll experience a segmentation fault while running this. I've
 narrowed its source down to the *cumulative_volume<bid>* function and will
-update this readme after this has been fixed.
+update this readme after this has been fixed. Expect more details to be added
+to this readme file in the coming days.
 
 ## Requirements
 
