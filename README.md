@@ -14,6 +14,11 @@ This repository's primary purpose
 is an example of how a given trading system could be designed in an object
 oriented fashion, using C++11, and implementing a few optimizations.
 
+There are two intended executables defined in the CMake file. One for the
+unit tests located in the test directory. And another executable that runs
+the trading system on some simulated data--it's main file is located in the
+example directory.
+
 # Overall Design
 
 The main base class, from which all other primary pieces of the trading system
