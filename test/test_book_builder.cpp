@@ -3,7 +3,7 @@
 //
 
 
-#include "book_builder.hpp"
+#include "../book_builder.hpp"
 #include "catch.hpp"
 
 #pragma clang diagnostic push

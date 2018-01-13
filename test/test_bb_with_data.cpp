@@ -4,13 +4,12 @@
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ClangTidyInspection"
-#define CATCH_CONFIG_MAIN
 
 #include "catch.hpp"
-#include "ipc_messages.hpp"
-#include "buffer_types.hpp"
-#include "book_builder.hpp"
-#include "fake_gateway.hpp"
+#include "../ipc_messages.hpp"
+#include "../buffer_types.hpp"
+#include "../book_builder.hpp"
+#include "../example/fake_gateway.hpp"
 
 
 TEST_CASE("test book_builder with simulation data", "[bb_sim_data]")

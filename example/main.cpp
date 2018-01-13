@@ -1,12 +1,12 @@
 
 #include <cstdlib>
 
-#include "buffer_types.hpp"
-#include "arbitrage_trader.hpp"
-#include "book_builder.hpp"
-#include "order_manager.hpp"
+#include "../buffer_types.hpp"
+#include "../arbitrage_trader.hpp"
+#include "../book_builder.hpp"
+#include "../order_manager.hpp"
 #include "fake_gateway.hpp"
-#include "trading_system_viewer.hpp"
+#include "../trading_system_viewer.hpp"
 
 using namespace aligned;
 

@@ -14,8 +14,8 @@
 #include <vector>
 #include <string>
 #include <chrono>
-#include "ipc_messages.hpp"
-#include "buffer_types.hpp"
+#include "../ipc_messages.hpp"
+#include "../buffer_types.hpp"
 //#include "trading_system_component.hpp"
 
 class csv_row;

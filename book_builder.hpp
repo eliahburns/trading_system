@@ -32,6 +32,12 @@ public:
     aligned::symbol_name symbol, aligned::venue_name venue
   );
 
+  book_builder(
+    tsc_type book_builder_id,
+    aligned::gw_to_bk_buffer& gw_to_bk_buffer1,
+    aligned::bk_to_strat_buffer& bk_to_strat_buffer1
+  );
+
   void component_main_loop() override;
 
   void handle_update() override;

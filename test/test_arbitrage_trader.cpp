@@ -2,7 +2,7 @@
 // Created by eli on 8/14/17.
 //
 
-#include "arbitrage_trader.hpp"
+#include "../arbitrage_trader.hpp"
 #include "catch.hpp"
 
 

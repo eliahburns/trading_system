@@ -8,7 +8,7 @@
 #include "order_manager.hpp"
 #include "arbitrage_trader.hpp"
 #include "book_builder.hpp"
-#include "fake_gateway.hpp"
+#include "example/fake_gateway.hpp"
 
 
 class trading_system_viewer

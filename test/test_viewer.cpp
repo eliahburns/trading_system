@@ -2,7 +2,7 @@
 // Created by eli on 8/19/17.
 //
 
-#include "trading_system_viewer.hpp"
+#include "../trading_system_viewer.hpp"
 #include "catch.hpp"
 
 #pragma clang diagnostic push

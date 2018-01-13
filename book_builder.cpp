@@ -18,6 +18,22 @@ book_builder::book_builder(trading_system_component::tsc_type book_builder_id,
   component_ready_ = true;
 }
 
+book_builder::book_builder(trading_system_component::tsc_type book_builder_id,
+                           aligned::gw_to_bk_buffer &gw_to_bk_buffer1,
+                           aligned::bk_to_strat_buffer &bk_to_strat_buffer1)
+  : trading_system_component(book_builder_id),
+    gw_to_bk_buffer_(gw_to_bk_buffer1),
+    bk_to_strat_buffer_(bk_to_strat_buffer1)
+/**
+ * Constructor used for unit tests.
+ */
+{
+  collection_name_ += "book_builder_" + std::to_string(book_builder_id);
+  component_ready_ = true;
+}
+
+
+
 void book_builder::update_book(aligned::message_t msg)
 // check if msg is delete or modify type and then look up in
 // id_price_map, else add order to bids or asks and store in id_price_map
