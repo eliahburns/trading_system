@@ -141,18 +141,20 @@ intended before we can react and turn it off or adjust parameters.
 I've included a file of a circular buffer implementation of mine, a header
 file, *buffer_types.hpp*, that defines types of different buffers to be used between specific
 components of the trading system, and another header file, *ipc_messages.hpp*,
-that has various messages define that used between producers and consumers passing
+that has various messages defined that are used between producers and consumers passing
 messages between each other using a given circular buffer.
 
 ## Requirements
 
 Currently, everything should be self contained in this directory except
-for MongoDB. If you want to clone this repository and run the tests you need
+for MongoDB and the Catch unit testing framework. If you want to clone this
+repository and run the tests you need
 to have this installed. If you look in *CMakeLists.txt* you will see there
-are paths defined where these are located on my Linux machine--you may have
+are paths defined where these are located on my Linux machine--you may need
 to modify these in order compile this project, as well. I'm considering removing
-this to make it easier to run the unit tests, but doing so would eliminate all
-examples of logging events with the trading system.
+MongoDB to make it easier to run the unit tests, but doing so would eliminate all
+examples of logging events with the trading system unless I write or include a method
+for logging to binary files.
 
 
 
